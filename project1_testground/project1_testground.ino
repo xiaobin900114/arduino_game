@@ -4,7 +4,12 @@ unsigned long topBarStartTime;
 unsigned long ledPlantTimer;
 unsigned long ledPlantStartTime;
 
+const int poten = A7;
+int potenValue;
+
+
 byte currentCol[8] = {0,0,0,0,0,0,0,0};
+byte colTest[8] = {B1000,B1000,B1000,B1000,B1000,B1000,B1000,B1000};
 
 void setup() {
   // put your setup code here, to run once:
@@ -14,6 +19,7 @@ void setup() {
   PORTD = B0;
   PORTC = B0;
   PORTB = B0;
+  pinMode(poten, INPUT);
 }
 
 void Frame (byte col_values[]) {
@@ -83,32 +89,29 @@ void LedPlant(byte colArray[], int interval) {
       colArray[i] = 0;
     }
   }
-/*  //for(byte i=1;i<7; i++) {
-   // colArray[i] = 0;
-  //}
-  byte lightUp = B10000000;
-  unsigned long startTime2 = 0;
-
-  unsigned long loopTime = 0;
-  
-  loopTime = millis() - startTime2;
-  
-  if(loopTime <= interval) {
-    colArray[7] = lightUp;
-  } else if(loopTime <= (interval*2) ) {
-    colArray[6] = lightUp;
-  } else {
-    startTime2 = millis();
-  }
-
-  Frame(colArray);*/
-  
 }
 
-void loop() {
-  TopBar(currentCol,500);
-  LedPlant(currentCol, 1000);
+void ControlPlant(byte colArray[]) {
+  potenValue = analogRead(poten);
+  potenValue = map(potenValue, 0, 1023, 0, 7);
+  /*for(byte i=7; i>0; i--) {
+    colArray[i] = colArray[i] >> potenValue;
+  }*/
 
+  colArray[0] >>= 1;
+  colArray[1] >>0;
+  colArray[2] >>1;
+  colArray[3] = B1000>>0;
+  colArray[4] = B1000 >>1;
+  colArray[5] = B1000 >>0;
+  colArray[6] = colArray[6] >>1;
+  colArray[7] = colArray[7] >>0;
+}
   
-  Frame(currentCol);
+void loop() {
+  //TopBar(currentCol,500);
+  //LedPlant(currentCol, 1000);
+  ControlPlant(colTest);
+  
+  Frame(colTest);
 }

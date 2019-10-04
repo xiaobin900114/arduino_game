@@ -4,6 +4,10 @@ unsigned long topBarStartTime;
 unsigned long ledPlantTimer;
 unsigned long ledPlantStartTime;
 
+const int poten = A7;
+int potenValue;
+
+
 byte currentCol[8] = {0,0,0,0,0,0,0,0};
 
 void setup() {
@@ -14,6 +18,8 @@ void setup() {
   PORTD = B0;
   PORTC = B0;
   PORTB = B0;
+  pinMode(poten, INPUT);
+  //Serial.begin(9600);
 }
 
 void Frame (byte col_values[]) {
@@ -66,16 +72,37 @@ void LedPlant(byte colArray[], int interval) {
   if(ledPlantTimer <= interval) {
     colArray[7] = B10000000;
   } else if(ledPlantTimer <= interval*2) {
+    colArray[7] = B10000000;
     colArray[6] = B10000000;
   } else if(ledPlantTimer <= interval*3) {
+    colArray[7] = B10000000;
+    colArray[6] = B10000000;
     colArray[5] = B10000000;
   } else if(ledPlantTimer <= interval*4) {
+    colArray[7] = B10000000;
+    colArray[6] = B10000000;
+    colArray[5] = B10000000;
     colArray[4] = B10000000;
   } else if(ledPlantTimer <= interval*5) {
+    colArray[7] = B10000000;
+    colArray[6] = B10000000;
+    colArray[5] = B10000000;
+    colArray[4] = B10000000;
     colArray[3] = B10000000;
   } else if(ledPlantTimer <= interval*6) {
+    colArray[7] = B10000000;
+    colArray[6] = B10000000;
+    colArray[5] = B10000000;
+    colArray[4] = B10000000;
+    colArray[3] = B10000000;
     colArray[2] = B10000000;
   } else if(ledPlantTimer <= interval*7) {
+    colArray[7] = B10000000;
+    colArray[6] = B10000000;
+    colArray[5] = B10000000;
+    colArray[4] = B10000000;
+    colArray[3] = B10000000;
+    colArray[2] = B10000000;
     colArray[1] = B10000000;
   } else {
     ledPlantStartTime = millis();
@@ -84,11 +111,26 @@ void LedPlant(byte colArray[], int interval) {
     }
   }
 }
+
+void ControlPlant(byte colArray[]) {
+  potenValue = analogRead(poten);
+  potenValue = map(potenValue, 0, 1023, 0, 7);
+  /*for(byte i=7; i>0; i--) {
+    colArray[i] = colArray[i] >> potenValue;
+  }*/
+  colArray[1] = colArray[1] >> potenValue;
+  colArray[2] = colArray[2] >> potenValue;
+  colArray[3] = colArray[3] >> potenValue;
+  colArray[4] = colArray[4] >> potenValue;
+  colArray[5] = colArray[5] >> potenValue;
+  colArray[6] = colArray[6] >> potenValue;
+  colArray[7] = colArray[7] >> potenValue;
+}
   
 void loop() {
   TopBar(currentCol,500);
   LedPlant(currentCol, 1000);
-
+  ControlPlant(currentCol);
   
   Frame(currentCol);
 }
