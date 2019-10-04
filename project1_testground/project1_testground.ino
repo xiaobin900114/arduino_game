@@ -1,68 +1,7 @@
-unsigned long startTime = 0;
+unsigned long topBarTimer;
+unsigned long topBarstartTime;
 
-byte A[] = {  B00000000,B00111100,B01100110,B01100110,B01111110,B01100110,B01100110,B01100110};
-byte B[] = {B01111000,B01001000,B01001000,B01110000,B01001000,B01000100,B01000100,B01111100};
-byte C[] = {B00000000,B00011110,B00100000,B01000000,B01000000,B01000000,B00100000,B00011110};
-byte D[] = {B00000000,B00111000,B00100100,B00100010,B00100010,B00100100,B00111000,B00000000};
-byte E[] = {B00000000,B00111100,B00100000,B00111000,B00100000,B00100000,B00111100,B00000000};
-byte F[] = {B00000000,B00111100,B00100000,B00111000,B00100000,B00100000,B00100000,B00000000};
-byte G[] = {B00000000,B00111110,B00100000,B00100000,B00101110,B00100010,B00111110,B00000000};
-byte H[] = {B00000000,B00100100,B00100100,B00111100,B00100100,B00100100,B00100100,B00000000};
-byte I[] = {B00000000,B00111000,B00010000,B00010000,B00010000,B00010000,B00111000,B00000000};
-byte J[] = {B00000000,B00011100,B00001000,B00001000,B00001000,B00101000,B00111000,B00000000};
-byte K[] = {B00000000,B00100100,B00101000,B00110000,B00101000,B00100100,B00100100,B00000000};
-byte L[] = {B00000000,B00100000,B00100000,B00100000,B00100000,B00100000,B00111100,B00000000};
-byte M[] = {B00000000,B00000000,B01000100,B10101010,B10010010,B10000010,B10000010,B00000000};
-byte N[] = {B00000000,B00100010,B00110010,B00101010,B00100110,B00100010,B00000000,B00000000};
-byte O[] = {B00000000,B00111100,B01000010,B01000010,B01000010,B01000010,B00111100,B00000000};
-byte P[] = {B00000000,B00111000,B00100100,B00100100,B00111000,B00100000,B00100000,B00000000};
-byte Q[] = {B00000000,B00111100,B01000010,B01000010,B01000010,B01000110,B00111110,B00000001};
-byte R[] = {B00000000,B00111000,B00100100,B00100100,B00111000,B00100100,B00100100,B00000000};
-byte S[] = {B00000000,B00111100,B00100000,B00111100,B00000100,B00000100,B00111100,B00000000};
-byte T[] = {B00000000,B01111100,B00010000,B00010000,B00010000,B00010000,B00010000,B00000000};
-byte U[] = {B00000000,B01000010,B01000010,B01000010,B01000010,B00100100,B00011000,B00000000};
-byte V[] = {B00000000,B00100010,B00100010,B00100010,B00010100,B00010100,B00001000,B00000000};
-byte W[] = {B00000000,B10000010,B10010010,B01010100,B01010100,B00101000,B00000000,B00000000};
-byte X[] = {B00000000,B01000010,B00100100,B00011000,B00011000,B00100100,B01000010,B00000000};
-byte Y[] = {B00000000,B01000100,B00101000,B00010000,B00010000,B00010000,B00010000,B00000000};
-byte Z[] = {B00000000,B00111100,B00000100,B00001000,B00010000,B00100000,B00111100,B00000000};
-
-byte O2[] = {
-  B00111100,
-  B01000010,
-  B01000010,
-  B01000010,
-  B01000010,
-  B00111100,
-  B00000000,
-  B00000000
-};
-
-
-
-byte LetterLove[] = {
-  B11100111,
-  B10011001,
-  B10000001,
-  B10000001,
-  B10000001,
-  B01000010,
-  B00100100,
-  B00011000
-};
-
-byte currentCol[8] = {
-  B0,
-  B0,
-  B0,
-  B0,
-  B0,
-  B0,
-  B0,
-  B0
-};
-
-
+byte currentCol[8] = {0,0,0,0,0,0,0,0};
 
 void setup() {
   // put your setup code here, to run once:
@@ -91,31 +30,58 @@ void Frame (byte col_values[]) {
   }
 }
 
-void TopRunningBar(byte topBar[], byte mask) {
-  topBar[0] = B11111111;
+void TopBar(byte colArray[], int interval) {
   
-  topBar[0] ^= (B11000000 >> mask);
+  topBarTimer = millis() - topBarstartTime;
+
+
+  if(topBarTimer <= interval) {
+    colArray[0] = B01111111;
+  } else if(topBarTimer <= interval*2) {
+    colArray[0] = B00111111;
+  } else if(topBarTimer <= interval*3) {
+    colArray[0] = B10011111;
+  } else if(topBarTimer <= interval*4) {
+    colArray[0] = B11001111;
+  } else if(topBarTimer <= interval*5) {
+    colArray[0] = B11100111;
+  } else if(topBarTimer <= interval*6) {
+    colArray[0] = B11110011;
+  } else if(topBarTimer <= interval*7) {
+    colArray[0] = B11111001;
+  } else if(topBarTimer <= interval*8) {
+    colArray[0] = B11111100;
+  } else if(topBarTimer <= interval*9) {
+    colArray[0] = B11111110;
+  } else {
+    topBarstartTime = millis();
+  }  
 }
 
-void TopBar(byte topBar[], int runTime) {
-    //use a for loop to control the first column 
-  for(byte i=0; i<8; i++) {
-    topBar[0] = B11111111;
-    
-    topBar[0] ^= (B11000000 >> i);
+void GrowingLed(byte colArray[], int interval) {
+  //for(byte i=1;i<7; i++) {
+   // colArray[i] = 0;
+  //}
+  byte lightUp = B10000000;
+  unsigned long startTime2 = 0;
 
-    //use a while loop to control and display the top bar
-    
-    unsigned long loopTime = 0;
-    
-    while (loopTime <= runTime) {
-      Frame(topBar);
-      loopTime = millis() - startTime;
-    }
-    startTime = millis();
+  unsigned long loopTime = 0;
+  
+  loopTime = millis() - startTime2;
+  
+  if(loopTime <= interval) {
+    colArray[7] = lightUp;
+  } else if(loopTime <= (interval*2) ) {
+    colArray[6] = lightUp;
+  } else {
+    startTime2 = millis();
   }
+
+  Frame(colArray);
+  
 }
 
 void loop() {
-  TopBar(currentCol,1000);
+  TopBar(currentCol,500);
+  Frame(currentCol);
 }
