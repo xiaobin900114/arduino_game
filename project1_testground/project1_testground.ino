@@ -1,5 +1,8 @@
 unsigned long topBarTimer;
-unsigned long topBarstartTime;
+unsigned long topBarStartTime;
+
+unsigned long ledPlantTimer;
+unsigned long ledPlantStartTime;
 
 byte currentCol[8] = {0,0,0,0,0,0,0,0};
 
@@ -32,8 +35,7 @@ void Frame (byte col_values[]) {
 
 void TopBar(byte colArray[], int interval) {
   
-  topBarTimer = millis() - topBarstartTime;
-
+  topBarTimer = millis() - topBarStartTime;
 
   if(topBarTimer <= interval) {
     colArray[0] = B01111111;
@@ -54,12 +56,34 @@ void TopBar(byte colArray[], int interval) {
   } else if(topBarTimer <= interval*9) {
     colArray[0] = B11111110;
   } else {
-    topBarstartTime = millis();
+    topBarStartTime = millis();
   }  
 }
 
-void GrowingLed(byte colArray[], int interval) {
-  //for(byte i=1;i<7; i++) {
+void LedPlant(byte colArray[], int interval) {
+  ledPlantTimer = millis() - ledPlantStartTime;
+
+  if(ledPlantTimer <= interval) {
+    colArray[7] = B10000000;
+  } else if(ledPlantTimer <= interval*2) {
+    colArray[6] = B10000000;
+  } else if(ledPlantTimer <= interval*3) {
+    colArray[5] = B10000000;
+  } else if(ledPlantTimer <= interval*4) {
+    colArray[4] = B10000000;
+  } else if(ledPlantTimer <= interval*5) {
+    colArray[3] = B10000000;
+  } else if(ledPlantTimer <= interval*6) {
+    colArray[2] = B10000000;
+  } else if(ledPlantTimer <= interval*7) {
+    colArray[1] = B10000000;
+  } else {
+    ledPlantStartTime = millis();
+    for (byte i=1; i<7; i++) {
+      colArray[i] = 0;
+    }
+  }
+/*  //for(byte i=1;i<7; i++) {
    // colArray[i] = 0;
   //}
   byte lightUp = B10000000;
@@ -77,11 +101,14 @@ void GrowingLed(byte colArray[], int interval) {
     startTime2 = millis();
   }
 
-  Frame(colArray);
+  Frame(colArray);*/
   
 }
 
 void loop() {
   TopBar(currentCol,500);
+  LedPlant(currentCol, 1000);
+
+  
   Frame(currentCol);
 }
