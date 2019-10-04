@@ -51,6 +51,17 @@ byte LetterLove[] = {
   B00011000
 };
 
+byte currentCol[8] = {
+  B0,
+  B0,
+  B0,
+  B0,
+  B0,
+  B0,
+  B0,
+  B0
+};
+
 
 
 void setup() {
@@ -80,33 +91,26 @@ void Frame (byte col_values[]) {
   }
 }
 
+void TopRunningBar(byte topBar[], byte mask) {
+  topBar[0] = B11111111;
+  
+  topBar[0] ^= (B11000000 >> mask);
+}
+
 void loop() {
-  unsigned long loopTime = millis() - startTime;
-  if (loopTime <= 1000) {
+
+  //use a for loop to control the first column 
+  for(byte i=0; i<8; i++) {
+    TopRunningBar(currentCol, i);
+
+    //use a while loop to control and display the top bar
     
-    Frame(LetterLove);
+    unsigned long loopTime = 0;
     
-  } else if (loopTime <= 2000) {
-    
-    Frame(C);
-    
-  } else if (loopTime <= 3000) {
-    
-    Frame(H);
-    
-  } else if (loopTime <= 4000) {
-    
-    Frame(I);
-    
-  } else if (loopTime <= 5000) {
-    
-    Frame(N);
-    
-  } else if (loopTime <= 6000) {
-    
-    Frame(A);
-    
-  } else {
+    while (loopTime <= 500) {
+      Frame(currentCol);
+      loopTime = millis() - startTime;
+    }
     startTime = millis();
   }
 }
