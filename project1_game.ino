@@ -4,9 +4,17 @@ unsigned long topBarStartTime;
 unsigned long ledPlantTimer;
 unsigned long ledPlantStartTime;
 
+unsigned long shootTimer;
+unsigned long shootStartTime;
+
+unsigned long globalTimer;
+unsigned long globalStartTime;
+
 const int poten = A7;
 int potenValue;
 
+const int btn = 13;
+boolean btnReading;
 
 byte currentCol[8] = {0,0,0,0,0,0,0,0};
 
@@ -19,6 +27,7 @@ void setup() {
   PORTC = B0;
   PORTB = B0;
   pinMode(poten, INPUT);
+  pinMode(btn, INPUT);
   //Serial.begin(9600);
 }
 
@@ -114,7 +123,7 @@ void LedPlant(byte colArray[], int interval) {
 
 void ControlPlant(byte colArray[]) {
   potenValue = analogRead(poten);
-  potenValue = map(potenValue, 0, 1023, 0, 7);
+  potenValue = map(potenValue,1023, 0, 0, 7);
   /*for(byte i=7; i>0; i--) {
     colArray[i] = colArray[i] >> potenValue;
   }*/
@@ -126,11 +135,33 @@ void ControlPlant(byte colArray[]) {
   colArray[6] = colArray[6] >> potenValue;
   colArray[7] = colArray[7] >> potenValue;
 }
+
+void ShootControl(byte colArray[]) {
+  
+  //Serial.println(btnReading);
+  for(byte i=1; i<8; i++) {
+    colArray[i] = colArray[i+1];
+  } 
+}
   
 void loop() {
-  TopBar(currentCol,500);
-  LedPlant(currentCol, 1000);
-  ControlPlant(currentCol);
+  btnReading = digitalRead(btn);
   
-  Frame(currentCol);
+  if(btnReading == HIGH) {
+    for(byte i=0;i<8;i++) {
+      ShootControl(currentCol);
+      while(globalTimer<=10) {
+        globalTimer = millis()-globalStartTime;
+        Frame(currentCol);
+        //Serial.println(currentCol[1]);
+      }
+      globalStartTime = millis();
+      globalTimer = millis()-globalStartTime;
+    } 
+  } else {
+    TopBar(currentCol,500);
+    LedPlant(currentCol, 1000);
+    ControlPlant(currentCol);
+    Frame(currentCol);
+  }
 }
