@@ -143,6 +143,10 @@ void ShootControl(byte colArray[]) {
     colArray[i] = colArray[i+1];
   } 
 }
+
+void Reset(byte colArray[]) {
+  ledPlantStartTime = millis();
+}
   
 void loop() {
   btnReading = digitalRead(btn);
@@ -157,7 +161,8 @@ void loop() {
       }
       globalStartTime = millis();
       globalTimer = millis()-globalStartTime;
-    } 
+    };
+    Reset(currentCol); 
   } else {
     TopBar(currentCol,500);
     LedPlant(currentCol, 1000);
