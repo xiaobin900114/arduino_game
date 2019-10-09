@@ -1,3 +1,5 @@
+//create timers for different functions
+
 unsigned long topBarTimer;
 unsigned long topBarStartTime;
 
@@ -15,15 +17,22 @@ unsigned long gameStartTime;
 
 unsigned long gameoverTimer;
 unsigned long gameoverStartTime;
+
+//global variables 
+
 boolean lose = false;
 boolean shoot = false;
 
+//set up potentiometer pin
 const int poten = A7;
 int potenValue;
 int gameSpeed;
 
+//set up button pin
 const int btn = 13;
 boolean btnReading;
+
+//create display array and other graphics
 
 byte currentCol[8] = {0,0,0,0,0,0,0,0};
 byte gameOverFace1[8] = {
@@ -53,6 +62,8 @@ void setup() {
   //Serial.begin(9600);
 }
 
+//display function 
+
 void Frame (byte col_values[]) {
   const int delayTime = 1;
   PORTC = B111111;
@@ -70,6 +81,8 @@ void Frame (byte col_values[]) {
     PORTB = B11;
   }
 }
+
+//top running bar function 
 
 void TopBar(byte colArray[], int interval) {
   
@@ -97,6 +110,8 @@ void TopBar(byte colArray[], int interval) {
     topBarStartTime = millis();
   }  
 }
+
+//function that controls the "led plant" to grow in every interval time period 
 
 void LedPlant(byte colArray[], int interval) {
   ledPlantTimer = millis() - ledPlantStartTime;
@@ -149,6 +164,8 @@ void LedPlant(byte colArray[], int interval) {
   }
 }
 
+// function that control the "led plant" to move
+
 void ControlPlant(byte colArray[]) {
   potenValue = analogRead(poten);
   potenValue = map(potenValue,1023, 0, 0, 7);
@@ -164,6 +181,8 @@ void ControlPlant(byte colArray[]) {
   colArray[7] = colArray[7] >> potenValue;
 }
 
+//function that shoot out the "led plant" 
+
 void ShootControl(byte colArray[]) {
   
   //Serial.println(btnReading);
@@ -173,11 +192,15 @@ void ShootControl(byte colArray[]) {
   colArray [7] = 0;
 }
 
+//reset function
+
 void Reset(byte colArray[]) {
   ledPlantStartTime = millis();
-  topBarStartTime = millis();
+  //topBarStartTime = millis();
   shoot = false;
 }
+
+//function that assesses if the shot led plant collides the top running bar
 
  void LoseOrNot(byte colArray[]) {
   if(colArray[0] == (colArray[0] | colArray[1]) ) {
@@ -186,6 +209,8 @@ void Reset(byte colArray[]) {
     lose = false;
   }
 }
+
+//gameover function 
 
 void GameOver() {
   gameoverStartTime = millis();
@@ -205,6 +230,8 @@ void GameOver() {
 }
   
 void loop() {
+
+  //control the speed of different level
   
   gameTimer = millis()-gameStartTime;
   if(gameTimer <= 15000) {
@@ -216,7 +243,13 @@ void loop() {
   }
   
   btnReading = digitalRead(btn);
+
+  //assess if the player push the shoot button 
+  
   if(btnReading == HIGH) {
+    
+    //call the shoot out functionto shoot the led plant
+    
     shoot = true;
     for(byte i=0;i<6;i++) {
       ShootControl(currentCol);
@@ -228,6 +261,9 @@ void loop() {
       globalStartTime = millis();
       globalTimer = millis()-globalStartTime;
     }
+
+    //assess if the the led plant collides the top bar or not
+    
     LoseOrNot(currentCol);
     if(lose == true) {
       GameOver();
